@@ -118,6 +118,7 @@ int main(int argc, char *args[])
                 const auto nextCounter = SDL_GetPerformanceCounter();
                 const auto seconds = (nextCounter - tickCounter) /
                                      static_cast<float>(tickFrequency);
+                cout << "Updating rate: " << 1 / seconds << " fps\n";
                 tickCounter = nextCounter;
                 game.Move(moveDirection, rotateDirection, seconds);
             }
