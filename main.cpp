@@ -2,12 +2,15 @@
 #include <stdio.h>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 
 #include "game.h"
 #include "raycaster.h"
 #include "raycaster_fixed.h"
 #include "raycaster_float.h"
 #include "renderer.h"
+
+#define GAME_TITLE "RayCaster [fixed-point vs. floating-point]"
 
 using namespace std;
 
@@ -68,11 +71,10 @@ int main(int argc, char *args[])
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
     } else {
-        SDL_Window *sdlWindow =
-            SDL_CreateWindow("RayCaster [fixed-point vs. floating-point]",
-                             SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-                             SCREEN_SCALE * (SCREEN_WIDTH * 2 + 1),
-                             SCREEN_SCALE * SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+        SDL_Window *sdlWindow = SDL_CreateWindow(
+            GAME_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
+            SCREEN_SCALE * (SCREEN_WIDTH * 2 + 1), SCREEN_SCALE * SCREEN_HEIGHT,
+            SDL_WINDOW_SHOWN);
 
         if (sdlWindow == NULL) {
             printf("Window could not be created! SDL_Error: %s\n",
@@ -101,6 +103,9 @@ int main(int argc, char *args[])
                 sdlRenderer, SDL_PIXELFORMAT_ARGB8888,
                 SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
+            float sec_cnt = 0;
+            int frame_cnt = 0;
+
             while (!isExiting) {
                 floatRenderer.TraceFrame(&game, floatBuffer);
                 fixedRenderer.TraceFrame(&game, fixedBuffer);
@@ -118,7 +123,17 @@ int main(int argc, char *args[])
                 const auto nextCounter = SDL_GetPerformanceCounter();
                 const auto seconds = (nextCounter - tickCounter) /
                                      static_cast<float>(tickFrequency);
-                cout << "Updating rate: " << 1 / seconds << " fps\n";
+
+                /* Compute FPS */
+                frame_cnt++;
+                sec_cnt += seconds;
+                if (sec_cnt >= 1.0f) {
+                    stringstream title;
+                    title << GAME_TITLE "   FPS = " << frame_cnt;
+                    SDL_SetWindowTitle(sdlWindow, title.str().c_str());
+                    sec_cnt = 0;
+                    frame_cnt = 0;
+                }
                 tickCounter = nextCounter;
                 game.Move(moveDirection, rotateDirection, seconds);
             }
