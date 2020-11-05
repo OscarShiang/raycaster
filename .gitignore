@@ -1,3 +1,5 @@
 *.o.d
 *.o
+raycaster_tables.h
 main
+table_generator

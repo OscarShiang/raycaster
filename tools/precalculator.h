@@ -1,10 +1,12 @@
 #pragma once
 
+#include <string>
+
 class RayCasterPrecalculator
 {
 public:
     RayCasterPrecalculator();
     ~RayCasterPrecalculator();
 
-    static void Precalculate();
+    static std::string Precalculate();
 };

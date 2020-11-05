@@ -1,15 +1,17 @@
 #include <math.h>
+#include <cstdint>
 #include <iostream>
 #include <sstream>
 
+#include "../raycaster.h"
 #include "precalculator.h"
-#include "raycaster_tables.h"
+
+using std::string;
 
 RayCasterPrecalculator::RayCasterPrecalculator() {}
 
 RayCasterPrecalculator::~RayCasterPrecalculator() {}
 
-#ifndef HAS_TABLES
 template <typename T>
 static void DumpLookupTable(std::ostringstream &dump, T *t, int len)
 {
@@ -23,11 +25,20 @@ static void DumpLookupTable(std::ostringstream &dump, T *t, int len)
         }
     }
 }
-#endif
 
-void RayCasterPrecalculator::Precalculate()
+string RayCasterPrecalculator::Precalculate()
 {
-#ifndef HAS_TABLES
+    uint16_t g_tan[256];
+    uint16_t g_cotan[256];
+    uint8_t g_sin[256];
+    uint8_t g_cos[256];
+    uint8_t g_nearHeight[256];
+    uint8_t g_farHeight[256];
+    uint16_t g_nearStep[256];
+    uint16_t g_farStep[256];
+    uint16_t g_overflowOffset[256];
+    uint16_t g_overflowStep[256];
+    uint16_t g_deltaAngle[SCREEN_WIDTH];
 
     // replace precalculated lookup tables with these results if you change any
     // constants
@@ -109,6 +120,7 @@ void RayCasterPrecalculator::Precalculate()
     dump << "const uint16_t LOOKUP_TBL g_deltaAngle[SCREEN_WIDTH] = ";
     DumpLookupTable(dump, g_deltaAngle, SCREEN_WIDTH);
 
-    std::cout << dump.str() << std::endl;
-#endif  // ! HAS_TABLES
+    dump << std::endl;
+
+    return dump.str();
 }
